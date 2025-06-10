@@ -1,0 +1,46 @@
+name: Deploy Application to Staging Kubernetes Cluster
+
+on:
+  push:
+    branches:
+      - staging # Trigger the workflow on push to the staging branch
+
+jobs:
+  containerize:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to DigitalOcean Container Registry
+        run: echo "${{ secrets.DO_API_TOKEN }}" | docker login registry.digitalocean.com -u docean --password-stdin
+
+      - name: Build Docker image
+        run: docker build --build-arg OLLAMA_BASE_URL='/ollama' --tag registry.digitalocean.com/scidar/open-webui:${{ github.sha }} -f Dockerfile.prod .
+
+      - name: Push Docker image to DigitalOcean
+        run: docker push registry.digitalocean.com/scidar/sap:${{ github.sha }}
+
+  update-manifest:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.sap.scidar.org
+    needs: containerize
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: scidar/SAP-Infra
+          token: ${{ secrets.CICD_DEPLOY_KEY }}
+
+      - name: Update manifest with new image tag
+        run: |
+          sed -i "s|image: registry.digitalocean.com/scidar/sap:.*|image: registry.digitalocean.com/scidar/sap:${{ github.sha }}|g" kubernetes/manifest/base/kustomization.yaml
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "muhammad.dauda@solinagroup.com"
+          git add kubernetes/manifests/base/kustomization.yaml
+          git commit -m "Update image tag to ${{ github.sha }}"
+          git push origin production
