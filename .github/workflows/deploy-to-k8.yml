@@ -33,9 +33,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: scidar/SAP-Infra
+          repository: SolinaGroup/SAP-Infra
           ref: main
-          ssh-key: ${{ secrets.CICD_DEPLOY_KEY }}
+          token: ${{ secrets.CICD_ACCESS_TOKEN }}
 
       - name: Update manifest with new image tag
         run: |
