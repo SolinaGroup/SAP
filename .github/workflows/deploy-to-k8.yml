@@ -39,9 +39,9 @@ jobs:
 
       - name: Update manifest with new image tag
         run: |
-          sed -i "s|image: registry.digitalocean.com/scidar/sap:.*|image: registry.digitalocean.com/scidar/sap:${{ github.sha }}|g" kubernetes/manifest/base/kustomization.yaml
+          sed -i "s|image: registry.digitalocean.com/scidar/sap:.*|image: registry.digitalocean.com/scidar/sap:${{ github.sha }}|g" kubernetes/manifests/overlays/staging/webui-deployment-patch.yaml
           git config --local user.name "GitHub Actions"
           git config --local user.email "muhammad.dauda@solinagroup.com"
-          git add kubernetes/manifests/base/kustomization.yaml
+          git add kubernetes/manifests/overlays/staging/webui-deployment-patch.yaml
           git commit -m "Update image tag to ${{ github.sha }}"
-          git push origin production
+          git push origin main
