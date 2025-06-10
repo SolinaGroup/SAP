@@ -18,7 +18,7 @@ jobs:
         run: echo "${{ secrets.DO_API_TOKEN }}" | docker login registry.digitalocean.com -u docean --password-stdin
 
       - name: Build Docker image
-        run: docker build --build-arg OLLAMA_BASE_URL='/ollama' --tag registry.digitalocean.com/scidar/open-webui:${{ github.sha }} -f Dockerfile.prod .
+        run: docker build --build-arg OLLAMA_BASE_URL='/ollama' --tag registry.digitalocean.com/scidar/sap:${{ github.sha }} -f Dockerfile.prod .
 
       - name: Push Docker image to DigitalOcean
         run: docker push registry.digitalocean.com/scidar/sap:${{ github.sha }}
