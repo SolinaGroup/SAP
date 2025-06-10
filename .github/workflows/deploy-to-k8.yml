@@ -34,7 +34,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: scidar/SAP-Infra
-          token: ${{ secrets.CICD_DEPLOY_KEY }}
+          ref: main
+          ssh-key: ${{ secrets.CICD_DEPLOY_KEY }}
 
       - name: Update manifest with new image tag
         run: |
